@@ -11,4 +11,20 @@ const pool = new Pool({
 	"idleTimeoutMillis":0
 });//TODO: determine ideal values for connectionTimeoutMillis and idleTimeoutMillis
 
-module.exports = pool;
+function issueQuery(p, query) {
+	try {
+		const results = await p.query(query);
+	} catch (err) {
+		console.err(err);
+	}
+	return results;
+}
+
+module.exports = {
+	pool,
+	db:{
+		getPositions:function(p){
+			return issueQuery(p, "select * from position");
+		}
+	}
+}
