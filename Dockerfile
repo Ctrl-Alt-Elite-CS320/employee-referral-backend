@@ -2,9 +2,6 @@ FROM node:14-alpine
 
 WORKDIR /srv/employee-referral-backend
 
-#Copying the code over
-COPY . .
-
 #Copying the package.json file
 COPY package*.json ./
 
@@ -13,6 +10,9 @@ RUN npm install
 
 #Open port
 EXPOSE 4000
+
+#Copying the code over
+COPY . .
 
 #Command to run
 CMD [ "node", "server.js" ]
