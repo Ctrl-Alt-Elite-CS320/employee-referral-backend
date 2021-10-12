@@ -1,5 +1,6 @@
 FROM node:14-alpine
 
+#Setting work directory
 WORKDIR /srv/employee-referral-backend
 
 #Copying the package.json file
