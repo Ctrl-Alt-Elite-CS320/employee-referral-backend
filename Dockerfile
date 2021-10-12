@@ -1,5 +1,8 @@
 FROM node:14-alpine
 
+#Making the directory
+mkdir -p /srv/employee-referral-backend
+
 #Setting work directory
 WORKDIR /srv/employee-referral-backend
 
