@@ -2,9 +2,6 @@ FROM node:14-alpine
 
 LABEL author="Thien Tran" maintainer="contact@tommytran.io"
 
-#Making the directory
-RUN mkdir -p /srv/employee-referral-backend
-
 #Setting work directory
 WORKDIR /srv/employee-referral-backend
 
