@@ -112,7 +112,7 @@ module.exports = {
 			 * :return: object containing the results of the p.query call
 			 */
 			return issueQuery(p, `select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
-		},
+		}
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
 		         using the RETURNING keyword. Very convenient in backend
 		*/
