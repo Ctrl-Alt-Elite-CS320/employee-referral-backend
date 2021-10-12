@@ -9,7 +9,7 @@ WORKDIR /srv/employee-referral-backend
 COPY . .
 
 #Install the apps
-RUN npm install
+RUN npm install --only=production
 
 #Open port
 EXPOSE 4000
