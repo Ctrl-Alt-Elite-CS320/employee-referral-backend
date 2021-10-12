@@ -11,7 +11,7 @@ const pool = new Pool({
 	"idleTimeoutMillis":0
 });//TODO: determine ideal values for connectionTimeoutMillis and idleTimeoutMillis
 
-function issueQuery(p, query) {
+async function issueQuery(p, query) {
 	try {
 		const results = await p.query(query);
 	} catch (err) {
