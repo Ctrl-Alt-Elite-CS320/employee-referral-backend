@@ -112,10 +112,39 @@ module.exports = {
 			 * :return: object containing the results of the p.query call
 			 */
 			return issueQuery(p, `select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
-		}
+		},
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
 		         using the RETURNING keyword. Very convenient in backend
 		*/
-		
+		registerUser: function (p, firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) {
+			return issueQuery(p, `insert into employee(firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) values (${firstName}, ${lastName}, ${email}, ${employeeId}, ${companyId}, ${companyName}, ${positionTitle}, ${startDate}, ${isManager}, ${password})`);
+		},
+		addPosition: function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
+			return issueQuery(p, `insert into positions(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (${datePosted}, ${title}, ${salary}, ${description}, ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
+		},
+		addApp: function (p, candEmail, candPhone, candFirst, candLast, date, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId) {
+			let candInfo = issueQuery(p, `insert into candidate(email, phone, firstName, lastName) values (${candEmail}, ${candPhone}, ${candFirst}, ${candLast})`);
+			let referralInfo = issueQuery(p, `insert into app(dateTime, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId, applicantCandEmail) values (${date}, ${applyingFor}, ${candDescription}, ${referredByEmployeeId}, ${referredByCompanyId}, ${candEmail})`);
+			return (candInfo, referralInfo);
+		},
+		//passes in Object:attributes where each key is an attribute used for the update query
+		updatePosition: function (p, currPosId, attributes) {
+			if (attributes == None || Object.keys(attributes).length == 0) {
+				return None;
+			}
+			str = "(";
+			for ([key, value] of Object.entries(attributes)) {
+				str = str.concat(`${key} = ${value},`);
+			}
+			str = str.substring(0, str.length - 1);
+			str = str.concat(")");
+			return issueQuery(p, `update position set ${str} where id = ${currPosId}`)
+		},
+		deletePosition: function (p, id) {
+			return issueQuery(p, `delete position where id = ${id}`);
+		},
+		deleteApp: function (p, id) {
+			return issueQuery(p, `delete app where id = ${id}`);
+		},
 	}
 }
