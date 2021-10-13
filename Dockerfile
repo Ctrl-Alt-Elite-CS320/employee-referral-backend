@@ -2,6 +2,9 @@ FROM node:14-alpine
 
 LABEL author="Thien Tran" maintainer="contact@tommytran.io"
 
+#Update Alpine
+RUN apk upgrade -U
+
 #Setting work directory
 WORKDIR /srv/employee-referral-backend
 
