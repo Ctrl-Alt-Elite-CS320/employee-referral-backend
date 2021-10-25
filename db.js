@@ -92,15 +92,15 @@ module.exports = {
 				) returning id;`
 			return issueQuery(p, q);
 		},
-		getPasswordForUsername:function(p, username){
+		getPasswordForUsername:async function(p, username){
 			/* Get the password for the employee with the given username. */
-			return issueQuery(p, `select password from employee where email=${username}`);
+			return await this.issueQuery(p, `select password from employee where email=${username}`);
 		},
-		getEmployeeForUsername:function(p, username){
+		getEmployeeForUsername:async function(p, username){
 			/* Get all fields of data associated with the given email address */
-			return issueQuery(p, `select * from employee where email=${username}`);
+			return await this.issueQuery(p, `select * from employee where email=${username}`);
 		},
-		getPositions:function(p, numberToRetrieve, offset, companyId){
+		getPositions: async function(p, numberToRetrieve, offset, companyId){
 			/**
 			 * Get the specified number of entries from position table, starting at the n-th entry, where n= the offset parameter.
 			 * 
@@ -111,24 +111,57 @@ module.exports = {
 			 * 
 			 * :return: object containing the results of the p.query call
 			 */
-			return issueQuery(p, `select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
+			return await this.issueQuery(p, `select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
 		},
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
 		         using the RETURNING keyword. Very convenient in backend
 		*/
-		registerUser: function (p, firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) {
-			return issueQuery(p, `insert into employee(firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) values (${firstName}, ${lastName}, ${email}, ${employeeId}, ${companyId}, ${companyName}, ${positionTitle}, ${startDate}, ${isManager}, ${password})`);
+		registerUser: async function (p, firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) {
+			return await this.issueQuery(p, `insert into employee(firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) values (${firstName}, ${lastName}, ${email}, ${employeeId}, ${companyId}, ${companyName}, ${positionTitle}, ${startDate}, ${isManager}, ${password})`);
 		},
-		addPosition: function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
-			return issueQuery(p, `insert into positions(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (${datePosted}, ${title}, ${salary}, ${description}, ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
+		/**
+		 * Add new position record into to position table
+		 * 
+		 * @param {Pool} p: pool object that calls query
+		 * @param {string} datePosted: the date in which position was posted. Should be 'YYYY-MM-DD' format
+		 * @param {string} title: position title
+		 * @param {number} salary: position salary
+		 * @param {string} description: position description
+		 * @param {number} minYearsExperience: minimum years of experience required for position
+		 * @param {number} postedByCompanyId: the company id of the employee who posted the position
+		 * @param {number} postedByEmpId: the employee id of the employee who posted the position
+		 * @returns: object containing the results of the p.query call
+		 */
+		addPosition: async function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
+			return await this.issueQuery(p, `insert into positions(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (${datePosted}, ${title}, ${salary}, ${description}, ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
 		},
-		addApp: function (p, candEmail, candPhone, candFirst, candLast, date, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId) {
-			let candInfo = issueQuery(p, `insert into candidate(email, phone, firstName, lastName) values (${candEmail}, ${candPhone}, ${candFirst}, ${candLast})`);
-			let referralInfo = issueQuery(p, `insert into app(dateTime, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId, applicantCandEmail) values (${date}, ${applyingFor}, ${candDescription}, ${referredByEmployeeId}, ${referredByCompanyId}, ${candEmail})`);
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} candEmail 
+		 * @param {*} candPhone 
+		 * @param {*} candFirst 
+		 * @param {*} candLast 
+		 * @param {*} date 
+		 * @param {*} applyingFor 
+		 * @param {*} candDescription 
+		 * @param {*} referredByEmployeeId 
+		 * @param {*} referredByCompanyId 
+		 * @returns 
+		 */
+		addApp: async function (p, candEmail, candPhone, candFirst, candLast, date, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId) {
+			let candInfo = await this.issueQuery(p, `insert into candidate(email, phone, firstName, lastName) values (${candEmail}, ${candPhone}, ${candFirst}, ${candLast})`);
+			let referralInfo = await this.issueQuery(p, `insert into app(dateTime, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId, applicantCandEmail) values (${date}, ${applyingFor}, ${candDescription}, ${referredByEmployeeId}, ${referredByCompanyId}, ${candEmail})`);
 			return (candInfo, referralInfo);
 		},
-		//passes in Object:attributes where each key is an attribute used for the update query
-		updatePosition: function (p, currPosId, attributes) {
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} currPosId 
+		 * @param {*} attributes 
+		 * @returns 
+		 */
+		updatePosition: async function (p, currPosId, attributes) {
 			if (attributes == None || Object.keys(attributes).length == 0) {
 				return None;
 			}
@@ -138,13 +171,62 @@ module.exports = {
 			}
 			str = str.substring(0, str.length - 1);
 			str = str.concat(")");
-			return issueQuery(p, `update position set ${str} where id = ${currPosId}`)
+			return await this.issueQuery(p, `update position set ${str} where id = ${currPosId}`)
 		},
-		deletePosition: function (p, id) {
-			return issueQuery(p, `delete position where id = ${id}`);
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} id 
+		 * @returns 
+		 */
+		deletePosition: async function (p, id) {
+			return await this.issueQuery(p, `delete position where id = ${id}`);
 		},
-		deleteApp: function (p, id) {
-			return issueQuery(p, `delete app where id = ${id}`);
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} id 
+		 * @returns 
+		 */
+		deleteApp: async function (p, id) {
+			return await this.issueQuery(p, `delete app where id = ${id}`);
 		},
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} positionId 
+		 * @returns 
+		 */
+		getApplications: async function(p, positionId){
+			return await this.issueQuery(`select * from app where applyingFor = ${positionId}`);
+		},
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} managerCompanyId 
+		 * @param {*} managerEmpId 
+		 * @returns 
+		 */
+		getPositionsPostedByManager: async function(p, managerCompanyId, managerEmpId){
+			return await this.issueQuery(`select * from position where postedByCompanyId = ${managerCompanyId} and postedByEmpId=${managerEmpId}`);
+		},
+		/**
+		 * 
+		 * @param {*} p 
+		 * @param {*} attributes 
+		 * @returns 
+		 */
+		getPositionsOther: async function (p, attributes) {
+			if (attributes == None || Object.keys(attributes).length == 0) {
+				return None;
+			}
+			str = "";
+			for ([key, value] of Object.entries(attributes)) {
+				str = str.concat(`${key} = ${value} AND`);
+			}
+			str = str.substring(0, str.length - 4);
+			return await this.issueQuery(p, `select * from position where ${str}`)
+		}
+
 	}
 }
