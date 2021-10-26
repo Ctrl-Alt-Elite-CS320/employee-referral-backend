@@ -12,10 +12,11 @@ const pool = new Pool({
 });//TODO: determine ideal values for connectionTimeoutMillis and idleTimeoutMillis
 
 async function issueQuery(p, query) {
+	let results = {}
 	try {
-		const results = await p.query(query);
+		results = await p.query(query);
 	} catch (err) {
-		console.err(err);
+		console.error(err);
 	}
 	return results;
 }
@@ -94,11 +95,11 @@ module.exports = {
 		},
 		getPasswordForUsername:async function(p, username){
 			/* Get the password for the employee with the given username. */
-			return await this.issueQuery(p, `select password from employee where email=${username}`);
+			return await issueQuery(p, `select password from employee where email=${username}`);
 		},
 		getEmployeeForUsername:async function(p, username){
 			/* Get all fields of data associated with the given email address */
-			return await this.issueQuery(p, `select * from employee where email=${username}`);
+			return await issueQuery(p, `select * from employee where email=${username}`);
 		},
 		getPositions: async function(p, numberToRetrieve, offset, companyId){
 			/**
@@ -111,13 +112,13 @@ module.exports = {
 			 * 
 			 * :return: object containing the results of the p.query call
 			 */
-			return await this.issueQuery(p, `select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
+			return await p.query(`select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
 		},
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
 		         using the RETURNING keyword. Very convenient in backend
 		*/
 		registerUser: async function (p, firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) {
-			return await this.issueQuery(p, `insert into employee(firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) values (${firstName}, ${lastName}, ${email}, ${employeeId}, ${companyId}, ${companyName}, ${positionTitle}, ${startDate}, ${isManager}, ${password})`);
+			return await issueQuery(p, `insert into employee(firstName, lastName, email, employeeId, companyId, companyName, positionTitle, startDate, isManager, password) values (${firstName}, ${lastName}, ${email}, ${employeeId}, ${companyId}, ${companyName}, ${positionTitle}, ${startDate}, ${isManager}, ${password})`);
 		},
 		/**
 		 * Add new position record into to position table
@@ -133,7 +134,7 @@ module.exports = {
 		 * @returns: object containing the results of the p.query call
 		 */
 		addPosition: async function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
-			return await this.issueQuery(p, `insert into positions(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (${datePosted}, ${title}, ${salary}, ${description}, ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
+			return await issueQuery(p, `insert into positions(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (${datePosted}, ${title}, ${salary}, ${description}, ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
 		},
 		/**
 		 * 
@@ -150,8 +151,8 @@ module.exports = {
 		 * @returns 
 		 */
 		addApp: async function (p, candEmail, candPhone, candFirst, candLast, date, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId) {
-			let candInfo = await this.issueQuery(p, `insert into candidate(email, phone, firstName, lastName) values (${candEmail}, ${candPhone}, ${candFirst}, ${candLast})`);
-			let referralInfo = await this.issueQuery(p, `insert into app(dateTime, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId, applicantCandEmail) values (${date}, ${applyingFor}, ${candDescription}, ${referredByEmployeeId}, ${referredByCompanyId}, ${candEmail})`);
+			let candInfo = await issueQuery(p, `insert into candidate(email, phone, firstName, lastName) values (${candEmail}, ${candPhone}, ${candFirst}, ${candLast})`);
+			let referralInfo = await issueQuery(p, `insert into app(dateTime, applyingFor, candDescription, referredByEmployeeId, referredByCompanyId, applicantCandEmail) values (${date}, ${applyingFor}, ${candDescription}, ${referredByEmployeeId}, ${referredByCompanyId}, ${candEmail})`);
 			return (candInfo, referralInfo);
 		},
 		/**
@@ -171,7 +172,7 @@ module.exports = {
 			}
 			str = str.substring(0, str.length - 1);
 			str = str.concat(")");
-			return await this.issueQuery(p, `update position set ${str} where id = ${currPosId}`)
+			return await issueQuery(p, `update position set ${str} where id = ${currPosId}`)
 		},
 		/**
 		 * 
@@ -180,7 +181,7 @@ module.exports = {
 		 * @returns 
 		 */
 		deletePosition: async function (p, id) {
-			return await this.issueQuery(p, `delete position where id = ${id}`);
+			return await issueQuery(p, `delete position where id = ${id}`);
 		},
 		/**
 		 * 
@@ -189,7 +190,7 @@ module.exports = {
 		 * @returns 
 		 */
 		deleteApp: async function (p, id) {
-			return await this.issueQuery(p, `delete app where id = ${id}`);
+			return await issueQuery(p, `delete app where id = ${id}`);
 		},
 		/**
 		 * 
@@ -198,7 +199,7 @@ module.exports = {
 		 * @returns 
 		 */
 		getApplications: async function(p, positionId){
-			return await this.issueQuery(`select * from app where applyingFor = ${positionId}`);
+			return await issueQuery(p, `select * from app where applyingFor = ${positionId}`);
 		},
 		/**
 		 * 
@@ -208,7 +209,7 @@ module.exports = {
 		 * @returns 
 		 */
 		getPositionsPostedByManager: async function(p, managerCompanyId, managerEmpId){
-			return await this.issueQuery(`select * from position where postedByCompanyId = ${managerCompanyId} and postedByEmpId=${managerEmpId}`);
+			return await issueQuery(p, `select * from position where postedByCompanyId = ${managerCompanyId} and postedByEmpId=${managerEmpId}`);
 		},
 		/**
 		 * 
@@ -225,7 +226,7 @@ module.exports = {
 				str = str.concat(`${key} = ${value} AND`);
 			}
 			str = str.substring(0, str.length - 4);
-			return await this.issueQuery(p, `select * from position where ${str}`)
+			return await issueQuery(p, `select * from position where ${str}`)
 		}
 
 	}

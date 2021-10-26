@@ -11,9 +11,9 @@ const hello = require("./routes/hello");
 app.use("/hello", hello);
 
 app.get("/all", async (req, res) => {
-	const results = await pool.query("select * from employee");
+	const results = db.getApplications(pool, 1)
 	console.log(results);
-	res.send({"results": results});
+	res.send({"results": results["rows"]});
 });
 
 const port = process.env.PORT || 4000;
