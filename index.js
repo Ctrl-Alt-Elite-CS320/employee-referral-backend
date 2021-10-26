@@ -11,8 +11,12 @@ const hello = require("./routes/hello");
 app.use("/hello", hello);
 
 app.get("/all", async (req, res) => {
-	const results = db.getApplications(pool, 1)
-	console.log(results);
+	//const results = await pool.query("insert into candidate (email, phone, firstname, lastname) values ('cwbarry@umass.edu', 6179454920, Chris, Barry)");
+	const results = await db.getPositionsOther(pool, [
+		"title = 'Software Engineer I'",
+		"salary > 75000"
+	])
+	console.log(results["rows"]);
 	res.send({"results": results["rows"]});
 });
 
