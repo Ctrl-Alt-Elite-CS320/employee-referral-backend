@@ -1,6 +1,43 @@
 const express = require("express");
 const app = express();
 const dbp = require("./db");
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+
+
+
+
+// ---- AUTH0 AUTHENTICATION -----
+
+// const { auth } = require('express-openid-connect');
+
+// const config = {
+//   authRequired: false,
+//   auth0Logout: true,
+//   secret: 'a long, randomly-generated string stored in env',
+//   baseURL: 'http://localhost:6500',
+//   clientID: 'xsKU505s8cZiWbKniZenJqedNGP6K6hT',
+//   issuerBaseURL: 'https://dev-2huf9bd9.auth0.com'
+// };
+
+// // auth router attaches /login, /logout, and /callback routes to the baseURL
+// app.use(auth(config));
+// const { requiresAuth } = require('express-openid-connect');
+
+// app.get('/profile', requiresAuth(), (req, res) => {
+//   res.send(JSON.stringify(req.oidc.user));
+// });
+
+// // req.isAuthenticated is provided from the auth router
+// app.get('/', (req, res) => {
+//   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+// });
+
+
+// ------ END AUTHENTICATION -----
+
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
@@ -16,7 +53,7 @@ app.get("/all", async (req, res) => {
 	res.send({"results": results});
 });
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 6500;
 app.listen(port, function () {
   console.log(`Starting a server at port ${port}`);
 }); //starts a server at this specific port
