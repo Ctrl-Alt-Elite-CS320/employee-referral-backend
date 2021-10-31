@@ -228,7 +228,7 @@ module.exports = {
 		 * gets positions based on certain conditional statements
 		 * 
 		 * @param {Pool} p: pool object that calls query
-		 * @param {[string]} attributes: array of strings that represent conditional statements. Ex: ["title = 'Software Engineer I'", "salary > 75000"]. MAKE SURE STRINGS VALUES ARE SURROUNDED BY ' '.
+		 * @param {[string]} conditions: array of strings that represent conditional statements. Ex: ["title = 'Software Engineer I'", "salary > 75000"]. MAKE SURE STRINGS VALUES ARE SURROUNDED BY ' '.
 		 * @returns object containing the results of the p.query call. Get list by accessing ["row"] key
 		 */
 		getPositionsOther: async function (p, conditions) {
