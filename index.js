@@ -13,6 +13,11 @@ app.use("/hello", hello);
 const positions = require("./routes/positions")
 app.use("/positions", positions);
 
+app.get("/employees", async function(req, res){
+  let results = await db.getAllEmployees(pool);
+  res.send(results["rows"]);
+})
+
 
 
 const port = process.env.PORT || 4000;

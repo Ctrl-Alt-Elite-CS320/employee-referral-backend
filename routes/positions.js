@@ -41,7 +41,7 @@ router.get('/filter', async function(req, res){
         conditions.push(`minYearsExperience = ${req.query.minYearsExperience}`);
     }
     let results = await db.getPositionsOther(pool, conditions);
-    res.send(results);
+    res.send(results["rows"]);
 });
 
 /**

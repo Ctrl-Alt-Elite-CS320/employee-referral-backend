@@ -94,6 +94,10 @@ module.exports = {
 				) returning id;`
 			return issueQuery(p, q);
 		},
+		getAllEmployees:async function(p){
+			return await issueQuery(p, `select * from employee`);
+		},
+
 		getPasswordForUsername:async function(p, username){
 			/* Get the password for the employee with the given username. */
 			return await issueQuery(p, `select password from employee where email = '${username}'`);
