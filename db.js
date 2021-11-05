@@ -12,10 +12,11 @@ const pool = new Pool({
 });//TODO: determine ideal values for connectionTimeoutMillis and idleTimeoutMillis
 
 async function issueQuery(p, query) {
+	let results;
 	try {
-		const results = await p.query(query);
+		results = await p.query(query);
 	} catch (err) {
-		console.err(err);
+		console.log(err);
 	}
 	return results;
 }
@@ -31,7 +32,8 @@ function sanitizeString(s) {
 
 module.exports = {
 	pool,
-	db:{
+	db: {
+		
 		insertEmployeeFromJSON:function(p, obj){
 			Object.keys(obj).forEach(key => {
 				obj[key] = sanitizeString(obj[key]);
