@@ -10,8 +10,11 @@ app.use(express.urlencoded({ extended: true }));
 const hello = require("./routes/hello");
 app.use("/hello", hello);
 
-const positions = require("./routes/positions")
+const positions = require("./routes/positions");
 app.use("/positions", positions);
+
+const users = require("./routes/users");
+app.use("/users", users);
 
 app.get("/employees", async function(req, res){
   let results = await db.getAllEmployees(pool);

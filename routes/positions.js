@@ -1,4 +1,7 @@
 const express = require('express');
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const router = express.Router();
 const dbp = require('../db.js');
 const db = dbp.db;
@@ -22,9 +25,6 @@ router.get('/', async function(req, res){
  */
 router.get('/filter', async function(req, res){
     conditions = []
-    for(var q in req.query){
-        console.log(q);
-    }
     if(!req.query){
         res.status(400).send("No queries")
     }
@@ -43,6 +43,35 @@ router.get('/filter', async function(req, res){
     let results = await db.getPositionsOther(pool, conditions);
     res.send(results["rows"]);
 });
+
+router.post('/new', async function(req, res){
+    let data = req.body;
+    if(Object.entries(data) == 0){
+        res.status(400).send("Empty body");
+    }
+    else if(!data.title){
+        res.status(400).send("Missing title");
+    }
+    else if(!data.salary){
+        res.status(400).send("Missing salary");
+    }
+    else if(!data.description){
+        res.status(400).send("Missing description");
+    }
+    else if(!data.minYearsExperience){
+        res.status(400).send("Missing minYearsExperience");
+    }
+    else if(!data.companyId){
+        res.status(400).send("Missing companyId");
+    }
+    else if(!data.empId){
+        res.status(400).send("Missing empId");
+    }
+    else{
+        let results = await db.addPosition(pool, data.title, data.salary, data.description, data.minYearsExperience, data.companyId, data.empId);
+        res.send(results["rows"]);
+    }
+})
 
 /**
  * sends back results filtered by company ID

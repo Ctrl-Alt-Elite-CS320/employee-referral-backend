@@ -133,7 +133,6 @@ module.exports = {
 		 * Add new position record into to position table
 		 * 
 		 * @param {Pool} p: pool object that calls query
-		 * @param {string} datePosted: the date in which position was posted. Should be 'YYYY-MM-DD' format
 		 * @param {string} title: position title
 		 * @param {number} salary: position salary
 		 * @param {string} description: position description
@@ -142,8 +141,8 @@ module.exports = {
 		 * @param {number} postedByEmpId: the employee id of the employee who posted the position
 		 * @returns: object containing the results of the p.query call.
 		 */
-		addPosition: async function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
-			return await issueQuery(p, `insert into position(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values ('${datePosted}', '${title}', ${salary}, '${description}', ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
+		addPosition: async function (p, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
+			return await issueQuery(p, `insert into position(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values (current_timestamp, '${title}', ${salary}, '${description}', ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
 		},
 		/** Add new application record into app table
 		 * 
@@ -186,6 +185,22 @@ module.exports = {
 			str = str.substring(0, str.length - 1);
 			console.log(str);
 			return await issueQuery(p, `update position set ${str} where id = ${currPosId}`)
+		},
+		updateEmployee: async function (p, email, attributes) {
+			if (Object.keys(attributes).length == 0) {
+				return {results:{}};
+			}
+			str = "";
+			for ([key, value] of Object.entries(attributes)) {
+				if(typeof value == "string"){
+					str = str.concat(`${key} = '${value}',`);
+				}else{
+					str = str.concat(`${key} = ${value},`);
+				}
+			}
+			str = str.substring(0, str.length - 1);
+			console.log(str);
+			return await issueQuery(p, `update employee set ${str} where email = '${email}'`)
 		},
 		/** FOREIGN KEY CONSTRAINT ON APP TABLE PREVENTS DELETION
 		 * deletes position based on position id
