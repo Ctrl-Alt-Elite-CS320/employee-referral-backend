@@ -34,6 +34,27 @@ function sanitizeString(s) {
 module.exports = {
 	pool,
 	db:{
+		insertApplicationFromJSON:function(p,obj){
+			Object.keys(obj).forEach(key => {
+				obj[key] = sanitizeString(obj[key]);
+			})
+			const q = `insert into app(
+				dateTime,
+				applyingFor,
+				candDescription,
+				referredByEmployeeId,
+				referredByCompanyId,
+				applicantCandId
+			) values (
+				current_timestamp,
+				${obj.applyingFor},
+				${obj.candDescription},
+				${obj.referredByEmployeeId},
+				${obj.referredByCompanyId},
+				${obj.applicantCandId}
+			);`
+			return issueQuery(p,q);
+		},
 		insertEmployeeFromJSON:function(p, obj){
 			Object.keys(obj).forEach(key => {
 				obj[key] = sanitizeString(obj[key]);

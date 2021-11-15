@@ -1,3 +1,8 @@
+const { body,validationResult } = require("express-validator");
+const dbp = require("./db");
+const pool = dbp.pool;//connection pool to psql
+const db = dbp.db;//helper function library object
+
 exports.all_get = async (req, res) => {
     res.send('not implemented: list of positions');
 };
@@ -27,12 +32,39 @@ exports.new_post = async (req, res) => {
 };
 
 exports.new_application_get = async (req, res) => {
-    res.send('not implemented: get form for new application for position w/ given id:' + req.params.id);
+    //TODO: make 'application_form' view using whatever library
+    res.render('application_form', { title: 'Create New Application', positionId: req.params.id });
 };
 
-exports.new_application_post = async (req, res) => {
-    res.send('not implemented: post new application for position w/ given id:' + req.params.id);
-};
+exports.new_application_post = [
+    //res.send('not implemented: post new application for position w/ given id:' + req.params.id);
+
+    //TODO: validate that position id exists, get employee id from req, and company id from req too
+    body('candDescription', 'Give a brief description of why the candidate is a good fit').trim().isLength({min:1}).escape(),
+    body('applicantCandEmail', 'Invalid email address').isEmail(),
+
+    //after validation, process request
+    async (req, res, next) => {
+        const errors = validationResult(req);
+        var app = {
+            applyingFor:1,//fixme, should be positionId
+            candDescription:req.body.candDescription,
+            referredByEmployeeId:1,//fixme, empId of active user
+            referredByCompanyId:1,//fixme, company id
+            applicantCandEmail:req.body.applicantCandEmail
+        };
+
+        if (!errors.isEmpty()){
+            //recall the form with error messages
+            res.render('application_form', { title: 'Create New Application', positionId: req.params.id, candDescription: req.body.candDescription, applicantCandEmail: req.body.applicantCandEmail, errors: errors.array() });
+            return;
+        } else {
+            //TODO: redirect to view confirmation
+            await db.insertApplicationFromJSON(pool, app);
+            //res.render('view confirmation')
+        }
+    }
+];
 
 exports.delete_get = async (req, res) => {
     res.send('not implemented: get congirmation for deleting position w/ given id:' + req.params.id);
