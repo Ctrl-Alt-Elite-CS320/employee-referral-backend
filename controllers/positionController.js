@@ -47,11 +47,11 @@ exports.new_application_post = [
         if (Number.isFinite(posId) || /^\d+$/.test(posId)){
             const results = await db.issueQuery(pool, q);
             if (results.rows[0].exists != 't'){
-                res.status(400).send('the job posting you\'re looking for doesn\'t exist')
+                res.status(404).render('site_404', { title: 'Not found' });//FIXME: site_404 react component (make/find it)
                 return;
             }
         } else {
-            res.status(400).send('the job posting you\'re looking for doesn\'t exist')
+            res.status(404).render('site_404', { title: 'Not found' });//FIXME: same as above
             return;
         }
     },
