@@ -34,6 +34,44 @@ function sanitizeString(s) {
 module.exports = {
 	pool,
 	db:{
+		issueQuery:async function (p, query) {
+			let results = {}
+			try {
+				results = await p.query(query);
+			} catch (err) {
+				console.error(err);
+			}
+			return results;
+		},
+		sanitizeString:function (s) {
+			/* Makes the input string safe for postgresql to intake (preserves ' etc.), or returns the passed-in object if it isn't a string.*/
+			if(typeof s === "string"){
+				return "E'" + s.replace("'", "\\x27") + "'";
+			} else {
+				return s;
+			}
+		},
+		insertApplicationFromJSON:function(p,obj){
+			Object.keys(obj).forEach(key => {
+				obj[key] = sanitizeString(obj[key]);
+			})
+			const q = `insert into app(
+				dateTime,
+				applyingFor,
+				candDescription,
+				referredByEmployeeId,
+				referredByCompanyId,
+				applicantCandId
+			) values (
+				current_timestamp,
+				${obj.applyingFor},
+				${obj.candDescription},
+				${obj.referredByEmployeeId},
+				${obj.referredByCompanyId},
+				${obj.applicantCandId}
+			);`
+			return issueQuery(p,q);
+		},
 		insertEmployeeFromJSON:function(p, obj){
 			Object.keys(obj).forEach(key => {
 				obj[key] = sanitizeString(obj[key]);
