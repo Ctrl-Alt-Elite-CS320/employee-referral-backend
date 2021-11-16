@@ -4,15 +4,58 @@ const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
 exports.all_get = async (req, res) => {
-    res.send('not implemented: list of positions');
-};
+    let id = req.params.compId;
+    let limit = 10000;
+    let offset = 0;
+    if(req.query.limit){
+        parseInt(limit, req.query.limit);
+    }
+    if(req.query.offset){
+        parseInt(offset, req.query.offset);
+    }
+    if(!id){
+        res.status(400).send("Missing parameter id");
+    }
+    let results = await db.getPositions(pool, limit, offset, compId);
+    res.send(results["rows"]);
+}
 
 exports.all_filtered_get = async (req, res) => {
-    res.send('not implemented: list of positions w/ filters');
-};
+    conditions = []
+    if(!req.query){
+        res.status(400).send("No queries");
+    }
+    if(req.query.compId){
+        conditions.push(`postedByCompanyId = ${req.query.compId}`);
+    }
+    if(req.query.empId){
+        conditions.push(`postedByEmpId = ${req.query.empId}`);
+    }
+    if(req.query.salaryGt){
+        conditions.push(`salary > ${req.query.salaryGt}`);
+    }
+    if(req.query.salaryLt){
+        conditions.push(`salary < ${req.query.salaryLt}`);
+    }
+    if(req.query.title){
+        conditions.push(`title = '${req.query.title}'`);
+    }
+    if(req.query.minYearsExperience){
+        conditions.push(`minYearsExperience = ${req.query.minYearsExperience}`);
+    }
+    let results = await db.getPositionsOther(pool, conditions);
+    res.send(results["rows"]);
+}
 
 exports.detail_get = async (req, res) => {
-    res.send('not implemented: details of position w/ given id:' + req.params.id);
+    let id = req.query.id;
+    let results = {}
+    if(!id){
+        res.status(400).send("Missing position id");
+    }else{
+        results = await db.getPositionsOther(pool, `id = ${id}`);
+    }
+    res.send(results["rows"]);
 };
 
 exports.applications_all_get = async (req, res) => {
@@ -28,7 +71,32 @@ exports.new_get = async (req, res) => {
 };
 
 exports.new_post = async (req, res) => {
-    res.send('not implemented: post new position');
+    let data = req.body;
+    if(Object.entries(data) == 0){
+        res.status(400).send("Empty body");
+    }
+    else if(!data.title){
+        res.status(400).send("Missing title");
+    }
+    else if(!data.salary){
+        res.status(400).send("Missing salary");
+    }
+    else if(!data.description){
+        res.status(400).send("Missing description");
+    }
+    else if(!data.minYearsExperience){
+        res.status(400).send("Missing minYearsExperience");
+    }
+    else if(!data.companyId){
+        res.status(400).send("Missing companyId");
+    }
+    else if(!data.empId){
+        res.status(400).send("Missing empId");
+    }
+    else{
+        let results = await db.addPosition(pool, data.title, data.salary, data.description, data.minYearsExperience, data.companyId, data.empId);
+        res.send(results["rows"]);
+    }
 };
 
 exports.new_application_get = async (req, res) => {
