@@ -1,5 +1,5 @@
 const { body,validationResult } = require("express-validator");
-const dbp = require("./db");
+const dbp = require("../db");
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
