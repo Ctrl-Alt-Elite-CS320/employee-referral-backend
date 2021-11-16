@@ -40,6 +40,21 @@ exports.new_application_post = [
     //res.send('not implemented: post new application for position w/ given id:' + req.params.id);
 
     //TODO: validate that position id exists, get employee id from req, and company id from req too
+    async(req, res, next) => {
+        var posId = req.params.id;
+        var q = `select exists (select * from position where id=${posId});`
+        //must ensure that posId is a number before querying it--security
+        if (Number.isFinite(posId) || /^\d+$/.test(posId)){
+            const results = await db.issueQuery(pool, q);
+            if (results.rows[0].exists != 't'){
+                res.status(400).send('the job posting you\'re looking for doesn\'t exist')
+                return;
+            }
+        } else {
+            res.status(400).send('the job posting you\'re looking for doesn\'t exist')
+            return;
+        }
+    },
     body('candDescription', 'Give a brief description of why the candidate is a good fit').trim().isLength({min:1}).escape(),
     body('applicantCandEmail', 'Invalid email address').isEmail(),
 
