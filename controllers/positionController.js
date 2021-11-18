@@ -1,10 +1,10 @@
 const { body,validationResult } = require("express-validator");
-const dbp = require("./db");
+const dbp = require("../db");
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
 exports.all_get = async (req, res) => {
-    let id = req.params.compId;
+    let id = req.query.compId;
     let limit = 10000;
     let offset = 0;
     if(req.query.limit){
@@ -13,11 +13,12 @@ exports.all_get = async (req, res) => {
     if(req.query.offset){
         parseInt(offset, req.query.offset);
     }
-    if(!id){
+    if(id == null){
         res.status(400).send("Missing parameter id");
+    } else {
+        let results = await db.getPositions(pool, limit, offset, id);
+        res.send(results["rows"]);
     }
-    let results = await db.getPositions(pool, limit, offset, compId);
-    res.send(results["rows"]);
 }
 
 exports.all_filtered_get = async (req, res) => {
