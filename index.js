@@ -56,12 +56,8 @@ auth(app);
 
 
 app.use("/hello", hello);
-
-app.get("/all", async (req, res) => {
-	const results = await pool.query("select * from employee");
-	console.log(results);
-	res.send({"results": results});
-});
+const positions = require("./routes/positions");
+app.use("/positions", positions);
 
 const port = process.env.PORT || 6500;
 app.listen(port, function () {
