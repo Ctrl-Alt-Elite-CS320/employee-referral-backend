@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const dbp = require("./db");
-
+const cors = require('cors')
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -41,12 +41,20 @@ dotenv.config();
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
+app.use(cors({
+	origin: 'http://localhost:3000'
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 const hello = require("./routes/hello");
 const auth = require("./routes/auth.routes");
 auth(app);
+
+// ----- Uncomment for user routes once implemented --------
+// const user = require("./routes/user.routes");
+// user(app);
+
+
 app.use("/hello", hello);
 
 app.get("/all", async (req, res) => {

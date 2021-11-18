@@ -37,20 +37,18 @@ var bcrypt = require("bcryptjs");
 //     });
 // };
 let users = [
-  { id: 1, username: "Shubh_Vashisht", password: bcrypt.hashSync("Godofwar123#", 8) },
-  { id: 2, username: "Harry_Potter", password: "Godofwar123#" },
-  { id: 3, username: "Harry_Styles", password: "Godofwar123#" },
-  { id: 4, username: "Angelina_Jolie", password: "Godofwar123#" },
-  { id: 5, username: "TheAlpha", password: "Godofwar123#" },
+  { id: 1, username: "smonzon@umass.edu", password: bcrypt.hashSync("password", 8) },
 ];
 
 
 
 
 exports.signin = async (req, res) => {
-  let pass = await db.db.getPasswordForUsername(db.pool, req.body.username);
-  res.status(202).send({ pass: pass });
-  return;
+  // let pass = await db.db.getPasswordForUsername(db.pool, req.body.username);
+  // res.status(202).send({ pass: pass });
+  // return;
+  
+  
   let user = users.find((elem) => elem.username === req.body.username);
   try {
     if (!user) {
