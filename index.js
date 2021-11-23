@@ -7,10 +7,10 @@ const db = dbp.db;//helper function library object
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const hello = require("./routes/hello");
-app.use("/hello", hello);
 const positions = require("./routes/positions");
 app.use("/positions", positions);
+const users = require("./routes/users");
+app.use("/users", users);
 
 const port = process.env.PORT || 4000;
 app.listen(port, function () {
