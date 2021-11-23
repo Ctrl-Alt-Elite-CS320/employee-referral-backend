@@ -49,7 +49,7 @@ exports.all_filtered_get = async (req, res) => {
 }
 
 exports.detail_get = async (req, res) => {
-    let id = req.query.id;
+    let id = req.params.id;
     let results = {}
     if(!id){
         res.status(400).send("Missing position id");
