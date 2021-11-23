@@ -8,10 +8,7 @@ const position_controller = require('../controllers/positionController');
 // POSITION ROUTES //
 
 //GET all positions in the company
-router.get("/all", position_controller.all_get);
-
-//GET all positions that match specified filters in the company
-router.get("/all/:filters", position_controller.all_filtered_get);
+router.get("/all", position_controller.all_filtered_get);
 
 //GET form for new position
 router.get("/new", position_controller.new_get);
