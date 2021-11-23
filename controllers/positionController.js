@@ -5,7 +5,7 @@ const db = dbp.db;//helper function library object
 
 //this isn't routed to anything at the moment
 exports.all_get = async (req, res) => {
-    let id = req.body.compId;
+    let id = req.query.compId;
     let limit = 10000;
     let offset = 0;
     if(req.query.limit){
