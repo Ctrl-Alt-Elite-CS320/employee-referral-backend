@@ -3,6 +3,7 @@ const dbp = require("../db");
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
+//this isn't routed to anything at the moment
 exports.all_get = async (req, res) => {
     let id = req.body.compId;
     let limit = 10000;
