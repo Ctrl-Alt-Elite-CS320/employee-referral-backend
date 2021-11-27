@@ -13,8 +13,8 @@ router.get('/signup', user_controller.signup_get);
 
 router.post('/signup', user_controller.signup_post);
 
-router.get('/:id', user_controller.detail_get);
+router.get('/:compId/:empId', user_controller.detail_get);
 
-router.get('/:id/delete', user_controller.detail_delete_get);
+router.get('/:compId/:empId/delete', user_controller.detail_delete_get);
 
 module.exports = router;
