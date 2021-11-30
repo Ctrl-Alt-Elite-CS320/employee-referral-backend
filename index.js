@@ -1,9 +1,14 @@
 const express = require("express");
 const app = express();
 const dbp = require("./db");
-const pool = dbp.pool;//connection pool to psql
-const db = dbp.db;//helper function library object
-
+const cors = require("cors");
+const pool = dbp.pool; //connection pool to psql
+const db = dbp.db; //helper function library object
+var corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
