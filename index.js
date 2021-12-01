@@ -10,11 +10,9 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const hello = require("./routes/hello");
 const auth = require("./routes/auth.routes");
 auth(app);
 
-app.use("/hello", hello);
 const positions = require("./routes/positions");
 app.use("/positions", positions);
 const users = require("./routes/users");
