@@ -251,6 +251,9 @@ module.exports = {
 		getApplications: async function(p, positionId){
 			return await issueQuery(p, `select * from app where applyingFor = ${positionId}`);
 		},
+		getApplicationDetail: async function(p, appId){
+			return await issueQuery(p, `select * from app where id = ${appId}`);
+		},
 		/**
 		 * gets list of positions posted by a specific manager
 		 * 

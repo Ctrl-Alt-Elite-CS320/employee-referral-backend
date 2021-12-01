@@ -1,8 +1,5 @@
 const express = require("express");
 const app = express();
-const dbp = require("./db");
-const pool = dbp.pool;//connection pool to psql
-const db = dbp.db;//helper function library object
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
