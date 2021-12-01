@@ -15,7 +15,7 @@ COPY . .
 RUN npm install --only=production
 
 #Open port
-EXPOSE 6500
+EXPOSE 4000
 
 #Command to run
 CMD [ "node", "index.js" ]
