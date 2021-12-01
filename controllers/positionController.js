@@ -3,6 +3,7 @@ const dbp = require("../db");
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
 
+//this isn't routed to anything at the moment
 exports.all_get = async (req, res) => {
     let id = req.query.compId;
     let limit = 10000;
@@ -49,7 +50,7 @@ exports.all_filtered_get = async (req, res) => {
 }
 
 exports.detail_get = async (req, res) => {
-    let id = req.query.id;
+    let id = req.params.id;
     let results = {}
     if(!id){
         res.status(400).send("Missing position id");

@@ -58,6 +58,8 @@ auth(app);
 app.use("/hello", hello);
 const positions = require("./routes/positions");
 app.use("/positions", positions);
+const users = require("./routes/users");
+app.use("/users", users);
 
 const port = process.env.PORT || 6500;
 app.listen(port, function () {
