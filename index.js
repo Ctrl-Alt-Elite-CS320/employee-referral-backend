@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const dbp = require("./db");
+
 const cors = require('cors')
 const dotenv = require('dotenv');
 dotenv.config();
@@ -37,9 +37,7 @@ dotenv.config();
 
 
 // ------ END AUTHENTICATION -----
-
-const pool = dbp.pool;//connection pool to psql
-const db = dbp.db;//helper function library object
+=======
 
 app.use(cors({
 	origin: 'http://localhost:3000'
