@@ -16,6 +16,7 @@ exports.all_get = async (req, res) => {
     }
     if(!id){
         res.status(400).send("Missing parameter id");
+        return;
     }
     let results = await db.getPositions(pool, limit, offset, id);
     res.send(results["rows"]);
@@ -25,6 +26,7 @@ exports.all_filtered_get = async (req, res) => {
     conditions = []
     if(!req.query){
         res.status(400).send("No queries");
+        return;
     }
     if(req.query.compId){
         conditions.push(`postedByCompanyId = ${req.query.compId}`);
@@ -53,6 +55,7 @@ exports.detail_get = async (req, res) => {
     let results = {}
     if(!id){
         res.status(400).send("Missing position id");
+        return;
     }else{
         results = await db.getPositionsOther(pool, `id = ${id}`);
     }
@@ -60,11 +63,34 @@ exports.detail_get = async (req, res) => {
 };
 
 exports.applications_all_get = async (req, res) => {
-    res.send('not implemented: show applications for position w/ given id:' + req.params.id);
+    let id = req.params.id;
+    let results = {};
+    if(!id){
+        res.status(400).send("Specified job opening does not exist");
+        return;
+    } else {
+        results = await db.getApplications(pool, id);
+        if (results["rows"].length == 0){
+            res.status(404).send("NOT FOUND");
+            return;
+        }
+    }
+    res.send(results["rows"]);
 };
 
 exports.application_detail_get = async (req, res) => {
     res.send('not implemented: show application with id:' + req.params.appId + ' for position w/ given id:' + req.params.id);
+    let id = req.params.id;
+    let appId = req.params.appId;
+    let results = {};
+    if(!id){
+        res.status(400).send("Specified job opening does not exist");
+    } else if(!appId){
+        res.status(400).send("Specified job referral does not exist");
+    } else {
+        results = await db.getApplicationsDetail(pool, id);
+    }
+    res.send(results["rows"]);
 };
 
 exports.new_get = async (req, res) => {
