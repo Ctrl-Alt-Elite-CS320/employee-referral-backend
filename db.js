@@ -249,7 +249,12 @@ module.exports = {
 		 * @returns object containing the results of the p.query call. Get list by accessing ["row"] key
 		 */
 		getApplications: async function(p, positionId){
-			return await issueQuery(p, `select * from app where applyingFor = ${positionId}`);
+			return await issueQuery(p, `select id, datetime, canddescription, applicantcandemail, candidate.phone as candphone, candidate.firstname as candfirst, candidate.lastname as candlast, employee.firstname as managerfirst, employee.lastname as managerlast, employee.email as manageremail 
+				from app 
+				inner join candidate 
+				on applicantcandemail=email 
+				inner join employee on referredbyemployeeid = employee.employeeid and referredbycompanyid=employee.companyid 
+				where applyingfor = ${positionId}`);
 		},
 		getApplicationDetail: async function(p, appId){
 			return await issueQuery(p, `select * from app where id = ${appId}`);
