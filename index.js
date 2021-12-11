@@ -2,9 +2,17 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
-app.use(cors());
+const dotenv = require('dotenv');
+dotenv.config();
+
+app.use(cors({
+	origin: 'http://localhost:3000'
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const auth = require("./routes/auth.routes");
+auth(app);
 
 const positions = require("./routes/positions");
 app.use("/positions", positions);

@@ -3,7 +3,7 @@ const Pool = require("pg").Pool;
 const pool = new Pool({
 	"user":"cae",
 	"password":"burgernuggetsnuggetsburger",
-	"database":"caedb",
+	"database":"testdb",
 	"host":"localhost",
 	"port":5432,
 	"max":20,
@@ -12,7 +12,7 @@ const pool = new Pool({
 });//TODO: determine ideal values for connectionTimeoutMillis and idleTimeoutMillis
 
 async function issueQuery(p, query) {
-	
+
 	let results = {}
 	try {
 		results = await p.query(query);
@@ -61,17 +61,24 @@ module.exports = {
 				candDescription,
 				referredByEmployeeId,
 				referredByCompanyId,
-				applicantCandId
+				candEmail,
+				candPhone,
+				candFirstName,
+				candLastName
 			) values (
 				current_timestamp,
 				${obj.applyingFor},
 				${obj.candDescription},
 				${obj.referredByEmployeeId},
 				${obj.referredByCompanyId},
-				${obj.applicantCandId}
+				${obj.candEmail},
+				${obj.candPhone},
+				${obj.candFirstName},
+				${obj.candLastName}
 			);`
 			return issueQuery(p,q);
 		},
+
 		insertEmployeeFromJSON:function(p, obj){
 			Object.keys(obj).forEach(key => {
 				obj[key] = sanitizeString(obj[key]);
@@ -81,7 +88,7 @@ module.exports = {
 					lastName,
 					email,
 					employeeId,
-					companyId, 
+					companyId,
 					companyName,
 					positionTitle,
 					startDate,
@@ -104,10 +111,10 @@ module.exports = {
 		insertPositionFromJSON:function(p, obj, user){
 			/**
 			 * Read in a JSON containing data for a new position and insert it into the database after sanitizing the strings therein.
-			 * 
+			 *
 			 * :param: p: pool of postgres clients which handles the insert command to the database
 			 * :param: obj: JSON to be put into the database, after fixing all its strings.
-			 * 
+			 *
 			 * :return: pg JSON from the insert statement; results.rows in this case should include the id of the newly created position
 			 */
 			Object.keys(obj).forEach(key => {
@@ -145,15 +152,31 @@ module.exports = {
 		getPositions: async function(p, numberToRetrieve, offset, companyId){
 			/**
 			 * Get the specified number of entries from position table, starting at the n-th entry, where n= the offset parameter.
-			 * 
+			 *
 			 * :param: p: pool object that calls query
 			 * :param: numberToRetrieve: how many rows to pull from the database
 			 * :param: offset: how many rows have already been seen, and should thus be skipped (to avoid re-rendering the same post in infinite scroll)
 			 * :param: companyId: what company's positions to search thru
-			 * 
+			 *
 			 * :return: object containing the results of the p.query call
 			 */
 			return await p.query(`select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
+		},
+		getManagerEmailFromPosition: async function (p, positionId, companyId) {
+			console.log("OI");
+			let positionQuery = await p.query(`select postedByEmpId from position where postedByCompanyId=${companyId} and id=${positionId}`);
+			if (positionQuery.rows) {
+				console.log("hi");
+
+				let position = positionQuery.rows[0];
+				console.log(position);
+				let managerQuery = await p.query(`select email from employee where employeeId=${position.postedbyempid} and companyId=${companyId}`);
+				if (managerQuery.rows) {
+					let managerEmail = managerQuery.rows[0].email;
+					return managerEmail;
+				}
+			}
+			return null;
 		},
 
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
@@ -165,7 +188,7 @@ module.exports = {
 
 		/**
 		 * Add new position record into to position table
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {string} datePosted: the date in which position was posted. Should be 'YYYY-MM-DD' format
 		 * @param {string} title: position title
@@ -180,7 +203,7 @@ module.exports = {
 			return await issueQuery(p, `insert into position(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values ('${datePosted}', '${title}', ${salary}, '${description}', ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
 		},
 		/** Add new application record into app table
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {string} candEmail: the candidate's email address
 		 * @param {number} candPhone: the candidate's phone number
@@ -199,7 +222,7 @@ module.exports = {
 			return [candInfo, referralInfo];
 		},
 		/** Updates a specific position's parameters bases on its id
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {number} currPosId: the position's id
 		 * @param {object} attributes: object of attributes needed to be updated. Ex: {salary: 110000, title:"Software Engineer II"}
@@ -223,7 +246,7 @@ module.exports = {
 		},
 		/** FOREIGN KEY CONSTRAINT ON APP TABLE PREVENTS DELETION
 		 * deletes position based on position id
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {number} id: id number of the position
 		 * @returns object containing the results of the p.query call
@@ -233,7 +256,7 @@ module.exports = {
 		},
 		/**
 		 * deletes application based on application id
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {number} id: id number of the application
 		 * @returns object containing the results of the p.query call
@@ -243,7 +266,7 @@ module.exports = {
 		},
 		/**
 		 * gets list of applications based on the position id
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {number} positionId: id number of the position
 		 * @returns object containing the results of the p.query call. Get list by accessing ["row"] key
@@ -261,7 +284,7 @@ module.exports = {
 		},
 		/**
 		 * gets list of positions posted by a specific manager
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {number} managerCompanyId: company id of manager (employee)
 		 * @param {number} managerEmpId: employee id of manager (employee)
@@ -272,7 +295,7 @@ module.exports = {
 		},
 		/**
 		 * gets positions based on certain conditional statements
-		 * 
+		 *
 		 * @param {Pool} p: pool object that calls query
 		 * @param {[string]} attributes: array of strings that represent conditional statements. Ex: ["title = 'Software Engineer I'", "salary > 75000"]. MAKE SURE STRINGS VALUES ARE SURROUNDED BY ' '.
 		 * @returns object containing the results of the p.query call. Get list by accessing ["row"] key
