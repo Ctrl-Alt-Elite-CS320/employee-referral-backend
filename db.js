@@ -162,6 +162,22 @@ module.exports = {
 			 */
 			return await p.query(`select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
 		},
+		getManagerEmailFromPosition: async function (p, positionId, companyId) {
+			console.log("OI");
+			let positionQuery = await p.query(`select postedByEmpId from position where postedByCompanyId=${companyId} and id=${positionId}`);
+			if (positionQuery.rows) {
+				console.log("hi");
+
+				let position = positionQuery.rows[0];
+				console.log(position);
+				let managerQuery = await p.query(`select email from employee where employeeId=${position.postedbyempid} and companyId=${companyId}`);
+				if (managerQuery.rows) {
+					let managerEmail = managerQuery.rows[0].email;
+					return managerEmail;
+				}
+			}
+			return null;
+		},
 
 		/* NOTE: For tables with serial/bigserial data types in the ID column, we can do insert statements which return the id
 		         using the RETURNING keyword. Very convenient in backend

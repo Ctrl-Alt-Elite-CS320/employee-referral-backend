@@ -177,9 +177,40 @@ exports.new_application_post = [
         } else {
             //TODO: redirect to view confirmation
             await db.insertApplicationFromJSON(pool, app);
-            res.status(200).send('Successfully referred');
+            next();
             //res.render('view confirmation')
         }
+    },
+    async (req, res, next) => {
+        let managerEmail = await db.getManagerEmailFromPosition(pool, req.body.positionId, req.userCompanyId);
+        let nodemailer = require('nodemailer');
+        let myEmail = 'admin@sinecureapp.com';
+        let myPassword = 'ZBF3jUND5PgEZreMcVffFW7ERz8fCdySLoZu5UGb';
+        let transporter = nodemailer.createTransport({
+        host: 'mail.tommytran.io',
+        secure: true,
+        auth: {
+            user: myEmail,
+            pass: myPassword
+        }
+        });
+
+        let mailOptions = {
+        from: myEmail,
+        to: managerEmail,
+        subject: 'You have received a new referral for your position',
+        text: 'Add an info message here',
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+        // Even if email is not sent, should still show that client is referred
+        res.status(200).send('Successfully referred');
+});
     }
 ];
 
