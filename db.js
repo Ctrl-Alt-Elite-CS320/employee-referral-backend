@@ -3,7 +3,7 @@ const Pool = require("pg").Pool;
 const pool = new Pool({
 	"user":"cae",
 	"password":"burgernuggetsnuggetsburger",
-	"database":"caedb",
+	"database":"testdb",
 	"host":"localhost",
 	"port":5432,
 	"max":20,
@@ -61,17 +61,24 @@ module.exports = {
 				candDescription,
 				referredByEmployeeId,
 				referredByCompanyId,
-				applicantCandId
+				candEmail,
+				candPhone,
+				candFirstName,
+				candLastName
 			) values (
 				current_timestamp,
 				${obj.applyingFor},
 				${obj.candDescription},
 				${obj.referredByEmployeeId},
 				${obj.referredByCompanyId},
-				${obj.applicantCandId}
+				${obj.candEmail},
+				${obj.candPhone},
+				${obj.candFirstName},
+				${obj.candLastName}
 			);`
 			return issueQuery(p,q);
 		},
+
 		insertEmployeeFromJSON:function(p, obj){
 			Object.keys(obj).forEach(key => {
 				obj[key] = sanitizeString(obj[key]);

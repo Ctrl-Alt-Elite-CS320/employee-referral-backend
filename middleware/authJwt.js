@@ -4,8 +4,12 @@ const config = require("../config/auth.config.js");
 
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
-
+  
+  console.log("VERIFY");
+  console.log(req.headers);
+  let token = req.headers.authorization;
+  token = token.split(" ")[1];
+  req.userId = "";
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
@@ -18,7 +22,9 @@ verifyToken = (req, res, next) => {
         message: "Unauthorized!"
       });
     }
-    req.userId = decoded.id;
+    req.employeeId = decoded.employeeId;
+    req.userIsManager = decoded.isManager;
+    req.userCompanyId = decoded.companyId;
     next();
   });
 };

@@ -1,7 +1,7 @@
 //referral route module
 const express = require("express");
 const router = express.Router();
-
+const authJwt = require("../middleware/authJwt");
 //require controller module
 const position_controller = require('../controllers/positionController');
 
@@ -29,7 +29,7 @@ router.get("/:id/applications/:appId", position_controller.applications_all_get)
 router.get("/:id/applications/new", position_controller.new_application_get);
 
 //POST new application for position with id
-router.post("/:id/applications/new", position_controller.new_application_post);
+router.post("/applications/new", [authJwt.verifyToken], position_controller.new_application_post);
 
 //GET delete confirmation for position with id
 router.get("/:id/delete", position_controller.delete_get);

@@ -99,6 +99,7 @@ exports.new_get = async (req, res) => {
 };
 
 exports.new_post = async (req, res) => {
+    
     let data = req.body;
     if(Object.entries(data) == 0){
         res.status(400).send("Empty body");
@@ -136,35 +137,39 @@ exports.new_application_post = [
     //res.send('not implemented: post new application for position w/ given id:' + req.params.id);
 
     //TODO: validate that position id exists, get employee id from req, and company id from req too
-    async(req, res, next) => {
-        var posId = req.params.id;
-        var q = `select exists (select * from position where id=${posId});`
+    async (req, res, next) => {
+        var posId = parseInt(req.body.positionId); //req.params.id
+        console.log("USER COMPANYID:", req.userCompanyId);
+        var q = `select exists (select * from position where id=${posId} and postedbycompanyid=${req.userCompanyId});`
         //must ensure that posId is a number before querying it--security
         if (Number.isFinite(posId) || /^\d+$/.test(posId)){
             const results = await db.issueQuery(pool, q);
-            if (results.rows[0].exists != 't'){
+            if (!results.rows[0].exists) {
+                console.log("A")
                 res.status(400).send('the job posting you\'re looking for doesn\'t exist')
                 return;
             }
         } else {
+            console.log("B");
             res.status(400).send('the job posting you\'re looking for doesn\'t exist')
             return;
         }
+        next();
     },
-    body('candDescription', 'Give a brief description of why the candidate is a good fit').trim().isLength({min:1}).escape(),
-    body('applicantCandEmail', 'Invalid email address').isEmail(),
-
     //after validation, process request
     async (req, res, next) => {
         const errors = validationResult(req);
         var app = {
-            applyingFor:1,//fixme, should be positionId
-            candDescription:req.body.candDescription,
-            referredByEmployeeId:1,//fixme, empId of active user
-            referredByCompanyId:1,//fixme, company id
-            applicantCandEmail:req.body.applicantCandEmail
+            applyingFor: req.body.positionId,//fixme, should be positionId
+            candDescription: req.body.candidateDescription,
+            referredByEmployeeId: req.employeeId,//fixme, empId of active user
+            referredByCompanyId: req.userCompanyId,//fixme, company id
+            candEmail: req.body.candidateEmail,
+            candFirstName: req.body.candidateFirstname,
+            candLastName: req.body.candidateLastname,
+            candPhone: req.body.candidatePhone
         };
-
+        console.log(app);
         if (!errors.isEmpty()){
             //recall the form with error messages
             res.render('application_form', { title: 'Create New Application', positionId: req.params.id, candDescription: req.body.candDescription, applicantCandEmail: req.body.applicantCandEmail, errors: errors.array() });
@@ -172,6 +177,7 @@ exports.new_application_post = [
         } else {
             //TODO: redirect to view confirmation
             await db.insertApplicationFromJSON(pool, app);
+            res.status(200).send('Successfully referred');
             //res.render('view confirmation')
         }
     }

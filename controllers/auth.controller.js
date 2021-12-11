@@ -37,25 +37,28 @@ var bcrypt = require("bcryptjs");
 //     });
 // };
 let users = [
-  { id: 1, username: "smonzon@umass.edu", password: bcrypt.hashSync("password", 8) },
+  { id: 1, username: "smonzon@umass.edu", password: bcrypt.hashSync("password", 8), isManager: true, companyId: 20021},
 ];
 
 
 
 
 exports.signin = async (req, res) => {
-  // let pass = await db.db.getPasswordForUsername(db.pool, req.body.username);
   // res.status(202).send({ pass: pass });
   // return;
+  // console.log(bcrypt.hashSync("password", 8));
+  let user = await db.db.getEmployeeForUsername(db.pool, req.body.username);
   
   
-  let user = users.find((elem) => elem.username === req.body.username);
+  // let user = users.find((elem) => elem.username === req.body.username);
   try {
-    if (!user) {
+    if (!user.rows) {
       return res.status(404).send({ message: "User Not found." });
     }
-    console.log(user);
-
+    user = user.rows[0];
+    // console.log(user);
+    // console.log(req.body.password,
+      // user.password);
     var passwordIsValid = bcrypt.compareSync(
       req.body.password,
       user.password
@@ -68,15 +71,15 @@ exports.signin = async (req, res) => {
       });
     }
 
-    var token = jwt.sign({ id: user.id }, config.secret, {
+
+    var token = jwt.sign({ employeeId: user.employeeid, isManager: user.ismanager, companyId: user.companyid}, config.secret, {
       expiresIn: 86400 // 24 hours
     });
 
-    var authorities = [];
     res.status(200).send({
-      id: user.id,
+      employeeId: user.employeeid,
       username: user.username,
-      roles: authorities,
+      isManager: user.ismanager,
       accessToken: token
     });
     // user.getRoles().then(roles => {
@@ -86,6 +89,7 @@ exports.signin = async (req, res) => {
         
     // });
   } catch (err) {
+    console.error(err);
       res.status(500).send({ message: err.message });
     
   }
