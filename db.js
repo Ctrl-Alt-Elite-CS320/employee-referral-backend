@@ -3,7 +3,7 @@ const Pool = require("pg").Pool;
 const pool = new Pool({
 	"user":"cae",
 	"password":"burgernuggetsnuggetsburger",
-	"database":"testdb",
+	"database":"caedb",
 	"host":"localhost",
 	"port":5432,
 	"max":20,
@@ -160,7 +160,7 @@ module.exports = {
 			 *
 			 * :return: object containing the results of the p.query call
 			 */
-			return await p.query(`select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);
+			return await p.query(`select * from position where postedByCompanyId=${companyId} limit ${numberToRetrieve} offset ${offset}`);//TODO get posting manager's name)
 		},
 		getManagerEmailFromPosition: async function (p, positionId, companyId) {
 			console.log("OI");
@@ -268,16 +268,36 @@ module.exports = {
 		 * gets list of applications based on the position id
 		 *
 		 * @param {Pool} p: pool object that calls query
-		 * @param {number} positionId: id number of the position
+		 * @param {obj} obj: JSON containing the position ID, user's employee ID, and user's company ID
 		 * @returns object containing the results of the p.query call. Get list by accessing ["row"] key
 		 */
-		getApplications: async function(p, positionId){
-			return await issueQuery(p, `select id, datetime, canddescription, applicantcandemail, candidate.phone as candphone, candidate.firstname as candfirst, candidate.lastname as candlast, employee.firstname as managerfirst, employee.lastname as managerlast, employee.email as manageremail 
-				from app 
-				inner join candidate 
-				on applicantcandemail=email 
-				inner join employee on referredbyemployeeid = employee.employeeid and referredbycompanyid=employee.companyid 
-				where applyingfor = ${positionId}`);
+		getApplications: async function(p, obj){
+			return await issueQuery(
+				p,
+				`select
+					applyingFor,
+					candEmail,
+					candPhone,
+					candFirstName,
+					candLastName,
+					candDescription,
+					dateTime,
+					referredByCompanyId,
+					referredByEmployeeId,
+					firstName,
+					lastName,
+					email 
+				from 
+					app,
+					employee,
+					position 
+				where 
+					app.applyingFor = ${obj.posId} and
+					app.applyingFor = position.id and
+					position.postedByEmpId = employee.employeeId and
+					position.postedByCompanyId = employee.companyId and
+					app.referredByCompanyId = ${obj.compId};`
+				);
 		},
 		getApplicationDetail: async function(p, appId){
 			return await issueQuery(p, `select * from app where id = ${appId}`);
