@@ -281,7 +281,7 @@ module.exports = {
 					candFirstName,
 					candLastName,
 					candDescription,
-					date,
+					dateTime,
 					referredByCompanyId,
 					firstName,
 					lastName,
@@ -293,7 +293,7 @@ module.exports = {
 				where 
 					app.applyingFor = ${obj.posId} and
 					app.applyingFor = position.id and
-					position.postedByEmployeeId = employee.employeeId and
+					position.postedByEmpId = employee.employeeId and
 					position.postedByCompanyId = employee.companyId and
 					app.referredByCompanyId = ${obj.compId};`
 				);
