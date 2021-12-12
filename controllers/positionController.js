@@ -124,11 +124,6 @@ exports.new_post = async (req, res) => {
     }
 };
 
-exports.new_application_get = async (req, res) => {
-    //TODO: make 'application_form' view using whatever library
-    res.render('application_form', { title: 'Create New Application', positionId: req.params.id });
-};
-
 exports.new_application_post = [
     //res.send('not implemented: post new application for position w/ given id:' + req.params.id);
 
