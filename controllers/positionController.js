@@ -94,10 +94,6 @@ exports.application_detail_get = async (req, res) => {
     res.send(results["rows"]);
 };
 
-exports.new_get = async (req, res) => {
-    res.send('not implemented: get form to create new position');
-};
-
 exports.new_post = async (req, res) => {
     
     let data = req.body;
@@ -116,11 +112,11 @@ exports.new_post = async (req, res) => {
     else if(!data.minYearsExperience){
         res.status(400).send("Missing minYearsExperience");
     }
-    else if(!data.companyId){
-        res.status(400).send("Missing companyId");
+    else if(!req.userCompanyId){
+        res.status(400).send("No company ID");
     }
-    else if(!data.empId){
-        res.status(400).send("Missing empId");
+    else if(!req.employeeId){
+        res.status(400).send("No employee ID");
     }
     else{
         let results = await db.addPosition(pool, data.title, data.salary, data.description, data.minYearsExperience, data.companyId, data.empId);
