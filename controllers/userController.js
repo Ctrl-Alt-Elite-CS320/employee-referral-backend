@@ -23,6 +23,31 @@ exports.detail_get = async (req, res) => {
 	}
 };
 
+exports.get_me = async (req, res) => {
+	console.log("GET ME");
+
+	if (req.employeeId == undefined) {
+		console.log("UNDEFINED");
+		res.status(400).send("Not Found");
+	} else {
+		let results = await db.issueQuery(pool, `select firstname, 
+			lastname,
+			email,
+			employeeid,
+			companyid,
+			companyname,
+			positiontitle,
+			startdate,
+			ismanager from employee where companyId=${req.userCompanyId} and employeeId=${req.employeeId}`);
+		if (results.rows) {
+			res.send(results["rows"][0]);
+		} else {
+			res.status(500).send("Backend error");
+		}
+	}
+	
+}
+
 exports.signup_get = async (req, res) => {
 	    res.send('not implemented: new user signup form GET')
 };

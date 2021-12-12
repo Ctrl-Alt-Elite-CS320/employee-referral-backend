@@ -1,6 +1,8 @@
 //user route module
 const express = require("express");
 const router = express.Router();
+const authJwt = require("../middleware/authJwt");
+
 
 //require controller module
 const user_controller = require('../controllers/userController');
@@ -13,10 +15,12 @@ router.get('/signup', user_controller.signup_get);
 
 router.post('/signup', user_controller.signup_post);
 
-//get details of user from empId param and compId in body
-router.get('/:empId', user_controller.detail_get);
+// //get details of user from empId param and compId in body
+// router.get('/:empId', user_controller.detail_get);
 
 //delete certain user by passing in empId param and compId in body
 router.get('/:empId/delete', user_controller.detail_delete_get);
+
+router.get('/me', [authJwt.verifyToken], user_controller.get_me);
 
 module.exports = router;

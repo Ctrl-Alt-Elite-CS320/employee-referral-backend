@@ -138,7 +138,7 @@ exports.new_application_post = [
 
     //TODO: validate that position id exists, get employee id from req, and company id from req too
     async (req, res, next) => {
-        var posId = parseInt(req.body.positionId); //req.params.id
+        var posId = parseInt(req.params.id); //req.params.id
         console.log("USER COMPANYID:", req.userCompanyId);
         var q = `select exists (select * from position where id=${posId} and postedbycompanyid=${req.userCompanyId});`
         //must ensure that posId is a number before querying it--security
@@ -160,7 +160,7 @@ exports.new_application_post = [
     async (req, res, next) => {
         const errors = validationResult(req);
         var app = {
-            applyingFor: req.body.positionId,//fixme, should be positionId
+            applyingFor: req.params.id,//fixme, should be positionId
             candDescription: req.body.candidateDescription,
             referredByEmployeeId: req.employeeId,//fixme, empId of active user
             referredByCompanyId: req.userCompanyId,//fixme, company id
@@ -182,7 +182,7 @@ exports.new_application_post = [
         }
     },
     async (req, res, next) => {
-        let managerEmail = await db.getManagerEmailFromPosition(pool, req.body.positionId, req.userCompanyId);
+        let managerEmail = await db.getManagerEmailFromPosition(pool, req.params.id, req.userCompanyId);
         let nodemailer = require('nodemailer');
         let myEmail = 'admin@sinecureapp.com';
         let myPassword = 'ZBF3jUND5PgEZreMcVffFW7ERz8fCdySLoZu5UGb';
