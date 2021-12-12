@@ -65,12 +65,19 @@ exports.detail_get = async (req, res) => {
 
 exports.applications_all_get = async (req, res) => {
     let id = req.params.id;
+    let obj = {
+        posId: id,
+        empId: req.employeeId,
+        compId: req.userCompanyId
+    };
     let results = {};
-    if(!id){
+    if(!parseInt(id)){
         res.status(400).send("Specified job opening does not exist");
         return;
+    } else if (!req.userIsManager) {
+        res.status(400).send("User does not have permission to view these");//TODO
     } else {
-        results = await db.getApplications(pool, id);
+        results = await db.getApplications(pool, obj);
         if (results["rows"].length == 0){
             res.status(404).send("NOT FOUND");
             return;
