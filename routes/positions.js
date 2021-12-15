@@ -17,7 +17,7 @@ router.post("/new", position_controller.new_post);
 router.get("/:id", position_controller.detail_get);
 
 //GET all applications for position with id
-router.get("/:id/applications/all", position_controller.applications_all_get);
+router.get("/:id/applications/all", [authJwt.verifyToken], position_controller.applications_all_get);
 
 //GET application with given id for position with id
 router.get("/:id/applications/:appId", position_controller.applications_all_get);
