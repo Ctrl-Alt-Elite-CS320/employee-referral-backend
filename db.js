@@ -274,29 +274,23 @@ module.exports = {
 		getApplications: async function(p, obj){
 			return await issueQuery(
 				p,
-				`select
-					applyingFor,
-					candEmail,
-					candPhone,
-					candFirstName,
-					candLastName,
-					candDescription,
-					dateTime,
-					referredByCompanyId,
-					referredByEmployeeId,
-					firstName,
-					lastName,
-					email 
-				from 
-					app,
-					employee,
-					position 
-				where 
-					app.applyingFor = ${obj.posId} and
-					app.applyingFor = position.id and
-					position.postedByEmpId = employee.employeeId and
-					position.postedByCompanyId = employee.companyId and
-					app.referredByCompanyId = ${obj.compId};`
+				`SELECT 
+					applyingFor, 
+					candEmail, 
+					candPhone, 
+					candFirstName, 
+					candLastName, 
+					candDescription, 
+					dateTime, 
+					referredByCompanyId, 
+					referredByEmployeeId, 
+					employee.firstname as firstName, 
+					employee.lastname as lastName, 
+					employee.email as email 
+				FROM app JOIN employee 
+					ON app.referredByCompanyId = employee.companyid 
+					AND app.referredByEmployeeId = employee.employeeid
+				WHERE applyingFor = ${obj.posId};`
 				);
 		},
 		getApplicationDetail: async function(p, appId){
