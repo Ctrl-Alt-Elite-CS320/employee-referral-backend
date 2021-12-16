@@ -8,6 +8,11 @@ verifyToken = (req, res, next) => {
   console.log("VERIFY");
   console.log(req.headers);
   let token = req.headers.authorization;
+  if (!token) {
+    return res.status(403).send({
+      message: "No token provided!"
+    });
+  }
   token = token.split(" ")[1];
   req.userId = "";
   if (!token) {

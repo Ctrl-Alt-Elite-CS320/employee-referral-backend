@@ -2,7 +2,7 @@ const { body,validationResult } = require("express-validator");
 const dbp = require("../db");
 const pool = dbp.pool;//connection pool to psql
 const db = dbp.db;//helper function library object
-
+const moment = require("moment");
 //this isn't routed to anything at the moment
 exports.all_get = async (req, res) => {
     let id = req.query.compId;
@@ -106,28 +106,43 @@ exports.new_post = async (req, res) => {
     let data = req.body;
     if(Object.entries(data) == 0){
         res.status(400).send("Empty body");
+        console.log("A");
     }
     else if(!data.title){
         res.status(400).send("Missing title");
+        console.log("B");
+
     }
     else if(!data.salary){
         res.status(400).send("Missing salary");
+        console.log("C");
+
     }
     else if(!data.description){
         res.status(400).send("Missing description");
+        console.log("D");
+
     }
     else if(!data.minYearsExperience){
         res.status(400).send("Missing minYearsExperience");
+        console.log("E");
+
     }
     else if(!req.userCompanyId){
         res.status(400).send("No company ID");
+        console.log("F");
+
     }
     else if(!req.employeeId){
         res.status(400).send("No employee ID");
+        console.log("G");
+
     }
     else{
-        let results = await db.addPosition(pool, data.title, data.salary, data.description, data.minYearsExperience, data.companyId, data.empId);
-        res.send(results["rows"]);
+        console.log("H");
+        
+        let results = await db.addPosition(pool, moment(new Date()).format("YYYY-MM-DD"), data.title, data.salary, data.description, data.minYearsExperience, req.userCompanyId, req.employeeId);
+        res.status(200).send(results.rowCount == 1);
     }
 };
 

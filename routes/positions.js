@@ -11,7 +11,7 @@ const position_controller = require('../controllers/positionController');
 router.get("/all", position_controller.all_filtered_get);
 
 //POST new position
-router.post("/new", position_controller.new_post);
+router.post("/new", [authJwt.verifyToken], position_controller.new_post);
 
 //GET position with id
 router.get("/:id", position_controller.detail_get);

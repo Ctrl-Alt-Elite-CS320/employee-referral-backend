@@ -200,7 +200,7 @@ module.exports = {
 		 * @returns: object containing the results of the p.query call.
 		 */
 		addPosition: async function (p, datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) {
-			return await issueQuery(p, `insert into position(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values ('${datePosted}', '${title}', ${salary}, '${description}', ${minYearsExperience}, ${postedByCompanyId}, ${postedByEmpId})`);
+			return await issueQuery(p, `insert into position(datePosted, title, salary, description, minYearsExperience, postedByCompanyId, postedByEmpId) values ('${datePosted}', '${title}', '${salary}', '${description}', '${minYearsExperience}', '${postedByCompanyId}', '${postedByEmpId}')`);
 		},
 		/** Add new application record into app table
 		 *
