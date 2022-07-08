@@ -16,7 +16,7 @@
     "express-openid-connect": "^2.5.1",
     "express-session": "^1.17.2",
     "express-validator": "^6.13.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "nodemailer": "^6.7.2",
     "parser": "^0.1.4",
     "passport-auth0": "^1.4.1",
